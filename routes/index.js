@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var User = require('../models/user');
+var Product = require('../models/product');
 var mid = require('../middleware');
 
 
@@ -24,14 +25,28 @@ router.post('/profile', function(req, res, next) {
         var err = new Error("Man");
         next(err);
       } else {
-          users.products.$push(req.body.title, req.body.cost, req.body.location, req.body.description);
-          users.save(function(err) {
-          if (err){
-            next(err);
-          }
-          return res.redirect('/about');
-        })
-        };
+          const product = new Product({
+              title: req.body.title,
+              cost: req.body.cost,
+              location: req.body.location,
+              description: req.body.description
+          });
+
+          product.save().then(data => {
+              res.send(data);
+          }).catch(err => {
+              res.status(500).send({
+                  message: err.message || 'An error occurred while creating the product.'
+              });
+          });
+        //   users.products.$push(req.body.title, req.body.cost, req.body.location, req.body.description);
+        //   users.save(function(err) {
+        //   if (err){
+        //     next(err);
+        //   }
+        //   return res.redirect('/about');
+        // })
+        }
       });
       });
 
